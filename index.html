@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องมือคำนวณสุขภาพและผลผลิต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #e8f5e9;
+            --text-color: #333;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #F8F9FA;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .tabs button {
+            background-color: transparent;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            outline: none;
+            color: #777;
+            font-weight: 600;
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+        }
+        .tabs button.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .calculate-btn:hover {
+            background-color: #43A047;
+        }
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+        .result {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1.2em;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .result h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .result p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .result-bmi strong, .result-fcr strong, .result-adg strong {
+            color: #2E7D32;
+            font-weight: bold;
+        }
+        .error-message {
+            color: #D32F2F;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>เครื่องมือคำนวณ</h1>
+
+    <div class="tabs">
+        <button id="tab-bmi" class="active" onclick="openTab('bmi')">BMI</button>
+        <button id="tab-fcr-adg" onclick="openTab('fcr-adg')">FCR & ADG</button>
+    </div>
+
+    <div id="bmi-tab" class="tab-content active">
+        <div class="input-group">
+            <label for="bmi-weight">น้ำหนัก (กิโลกรัม):</label>
+            <input type="number" id="bmi-weight" step="0.1" placeholder="เช่น 65" required>
+        </div>
+        <div class="input-group">
+            <label for="bmi-height">ส่วนสูง (เมตร):</label>
+            <input type="number" id="bmi-height" step="0.01" placeholder="เช่น 1.70" required>
+        </div>
+        <button class="calculate-btn" onclick="calculateBMI()">คำนวณ BMI</button>
+        <div id="bmi-result" class="result"></div>
+    </div>
+
+    <div id="fcr-adg-tab" class="tab-content">
+        <div class="input-group">
+            <label for="initialWeight">น้ำหนักเริ่มต้น (กิโลกรัม)</label>
+            <input type="number" id="initialWeight" placeholder="เช่น 10">
+        </div>
+        <div class="input-group">
+            <label for="finalWeight">น้ำหนักสุดท้าย (กิโลกรัม)</label>
+            <input type="number" id="finalWeight" placeholder="เช่น 25">
+        </div>
+        <div class="input-group">
+            <label for="totalFeed">ปริมาณอาหารที่กินทั้งหมด (กิโลกรัม)</label>
+            <input type="number" id="totalFeed" placeholder="เช่น 22.5">
+        </div>
+        <div class="input-group">
+            <label for="numberOfDays">จำนวนวันเลี้ยง</label>
+            <input type="number" id="numberOfDays" placeholder="เช่น 60">
+        </div>
+        <button class="calculate-btn" onclick="calculateFCRADG()">คำนวณ FCR & ADG</button>
+        <div id="fcr-adg-result" class="result"></div>
+    </div>
+
+</div>
+
+<script>
+    // Function for tab switching
+    function openTab(tabName) {
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(tab => tab.classList.remove('active'));
+
+        const tabButtons = document.querySelectorAll('.tabs button');
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // Function to calculate BMI
+    function calculateBMI() {
+        const weight = parseFloat(document.getElementById('bmi-weight').value);
+        const height = parseFloat(document.getElementById('bmi-height').value);
+        const resultDiv = document.getElementById('bmi-result');
+
+        if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
+            resultDiv.innerHTML = '<p class="error-message">กรุณากรอกน้ำหนักและส่วนสูงที่ถูกต้อง</p>';
+            return;
+        }
+
+        const bmi = weight / (height * height);
+        let status;
+        if (bmi < 18.5) {
+            status = "น้ำหนักต่ำกว่าเกณฑ์";
+        } else if (bmi < 25) {
+            status = "น้ำหนักปกติ";
+        } else if (bmi < 30) {
+            status = "น้ำหนักเกิน";
+        } else {
+            status = "โรคอ้วน";
+        }
+
+        resultDiv.innerHTML = `
+            <h2>ผลลัพธ์ BMI</h2>
+            <p>ค่า BMI ของคุณคือ: <strong class="result-bmi">${bmi.toFixed(2)}</strong></p>
+            <p>คุณอยู่ในเกณฑ์: <strong class="result-bmi">${status}</strong></p>
+        `;
+    }
+
+    // Function to calculate FCR & ADG
+    function calculateFCRADG() {
+        const initialWeight = parseFloat(document.getElementById('initialWeight').value);
+        const finalWeight = parseFloat(document.getElementById('finalWeight').value);
+        const totalFeed = parseFloat(document.getElementById('totalFeed').value);
+        const numberOfDays = parseFloat(document.getElementById('numberOfDays').value);
+        const resultDiv = document.getElementById('fcr-adg-result');
+
+        if (isNaN(initialWeight) || isNaN(finalWeight) || isNaN(totalFeed) || isNaN(numberOfDays) ||
+            initialWeight < 0 || finalWeight < 0 || totalFeed < 0 || numberOfDays <= 0) {
+            resultDiv.innerHTML = '<p class="error-message">กรุณากรอกข้อมูลให้ถูกต้อง</p>';
+            return;
+        }
+
+        const weightGain = finalWeight - initialWeight;
+
+        if (weightGain <= 0) {
+            resultDiv.innerHTML = '<p class="error-message">น้ำหนักสุดท้ายต้องมากกว่าน้ำหนักเริ่มต้น</p>';
+            return;
+        }
+
+        const fcr = totalFeed / weightGain;
+        const adg = weightGain / numberOfDays;
+
+        resultDiv.innerHTML = `
+            <h2>ผลลัพธ์</h2>
+            <p><strong>FCR (อัตราการเปลี่ยนอาหาร):</strong> <strong class="result-fcr">${fcr.toFixed(2)}</strong></p>
+            <p><strong>ADG (อัตราการเติบโตเฉลี่ยต่อวัน):</strong> <strong class="result-adg">${adg.toFixed(3)}</strong> กิโลกรัม/วัน</p>
+        `;
+    }
+</script>
+
+</body>
+</html>
